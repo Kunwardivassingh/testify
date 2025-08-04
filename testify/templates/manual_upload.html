@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Insights</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/datainsights_styles.css') }}">
+</head>
+<body>
+  <header class="di-header">
+    <div class="di-logo">Data Insights</div>
+    <nav class="di-nav">
+      <a href="#">Overview</a>
+      <a href="/dashboard">Dashboards</a>
+      <a href="#">Reports</a>
+      <a href="#">Alerts</a>
+    </nav>
+    <div class="di-user-icon"></div>
+  </header>
+  <main>
+    <section class="di-upload-section">
+      <h2>Upload Data</h2>
+      <p>Upload Excel or CSV files to analyze your test data.</p>
+      <div class="di-upload-area">
+        <div class="di-drop-zone" id="di-drop-zone">
+          <div class="di-cloud-icon"></div>
+          <p>Drag and drop your file here</p>
+          <p>Or, click the button to browse for a file on your computer.</p>
+          <input type="file" id="di-file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+          <button class="di-browse-button" onclick="document.getElementById('di-file-input').click()">Browse Files</button>
+        </div>
+      </div>
+      <div id="di-sample-data" class="di-file-preview" style="display: none;">
+        <div class="di-table-container">
+          <table id="di-data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Test Case ID</th>
+                <th>Product Name</th>
+                <th>Test ID</th>
+                <th>Test Type</th>
+                <th>Status</th>
+                <th>Execution Date</th>
+                <th>Frequency</th>
+                <th>Tester</th>
+                <th>Test Duration</th>
+              </tr>
+            </thead>
+            <tbody id="di-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <button class="di-upload-process-button" id="di-process-button" onclick="uploadAndRedirect()" style="display: none;">Upload and Process</button>
+    </section>
+  </main>
+  <script>
+    const dropZone = document.getElementById('di-drop-zone');
+    const fileInput = document.getElementById('di-file-input');
+    const sampleDataDiv = document.getElementById('di-sample-data');
+    const processButton = document.getElementById('di-process-button');
+    const tableBody = document.getElementById('di-table-body');
+
+    // Handle file drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#1da1f2';
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#ced4da';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#ced4da';
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    // Handle file input change
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length > 0) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+
+    function excelDateToJSDate(serial) {
+      const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+      const delta = serial * 24 * 60 * 60 * 1000;
+      const jsDate = new Date(excelEpoch.getTime() + delta);
+      return jsDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    }
+
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, {type: 'array'});
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+
+        const rows = [];
+        worksheet.forEach((row, index) => {
+          if (index === 0) return; // Skip header row
+          rows.push({
+            id: row[0] || null,
+            report_id: row[1] || null,
+            product_name: row[2] || '',
+            test_id: row[3] || '',
+            test_type: row[4] || '',
+            status: row[5] || 'Pending',
+            execution_date: excelDateToJSDate(row[6]) || null,
+            frequency: parseInt(row[7]) || 0,
+            tester: row[8] || '',
+            test_duration: parseInt(row[9]) || 0
+          });
+        });
+
+        tableBody.innerHTML = '';
+        rows.forEach(row => {
+          const tr = document.createElement('tr');
+          Object.values(row).forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell || '-';
+            tr.appendChild(td);
+          });
+          tableBody.appendChild(tr);
+        });
+
+        sampleDataDiv.style.display = 'block';
+        processButton.style.display = 'block';
+        window.uploadedData = rows; // Store data globally for upload
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function uploadAndRedirect() {
+      if (window.uploadedData) {
+      fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+        rows: window.uploadedData,
+        user_id: 1, // Replace with dynamic user ID from session
+        source_type: 'upload'
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Upload Success:', data);
+        window.location.href = '/dashboard'; // Redirect to dashboard route
+      })
+      .catch(error => console.error('Error:', error));
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mode Selection</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}">
+</head>
+<body>
+    <div class="mode-container">
+        <div class="mode-header">
+            <img src="{{ url_for('static', filename='testanalytics-logo.png') }}" alt="TestAnalytics Logo" class="mode-logo">
+        </div>
+        <div class="mode-card">
+            <h2 class="mode-title">Choose Your Analysis Mode</h2>
+            <p class="mode-subtitle">Select how you want to analyze your test data.</p>
+            <div class="mode-options">
+                <div class="mode-option">
+                    <span class="mode-icon">📺</span>
+                    <h3 class="mode-option-title">Manual</h3>
+                    <p class="mode-option-desc">Upload and analyze your test data files at your own pace.</p>
+                    <a href="{{ url_for('upload.upload_file') }}" class="mode-option-button">Select Manual</a>
+                </div>
+                <div class="mode-option">
+                    <span class="mode-icon">⚡</span>
+                    <h3 class="mode-option-title">Real-Time</h3>
+                    <p class="mode-option-desc">Connect to a live data stream for continuous analysis.</p>
+                    <a href="{{ url_for('api_fetch.realtime_config') }}" class="mode-option-button">Select Real-Time</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

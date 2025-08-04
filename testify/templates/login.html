@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="{{ url_for('static', filename='testify-logo.png') }}" alt="Testify Logo" class="login-logo">
+            <nav class="login-nav">
+                <a href="#" class="nav-link">Overview</a>
+                <a href="#" class="nav-link">Dashboards</a>
+                <a href="#" class="nav-link">Reports</a>
+                <a href="#" class="nav-link">Tests</a>
+                <a href="#" class="nav-link">Runs</a>
+                <a href="#" class="nav-link">Settings</a>
+            </nav>
+        </div>
+        <div class="login-card">
+            <h2 class="login-title">Welcome Back</h2>
+            <p class="login-subtitle">Enter your credentials to access your account.</p>
+            <form method="POST" action="{{ url_for('auth.login') }}" class="login-form">
+                <div class="form-group">
+                    <label for="login-email" class="form-label">Email Address</label>
+                    <input type="email" id="login-email" name="email" class="form-input" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password" class="form-label">Password</label>
+                    <input type="password" id="login-password" name="password" class="form-input" placeholder="********" required>
+                    <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot password?</a>
+                </div>
+                <button type="submit" class="login-button">Log in</button>
+                <p class="login-footer">
+                    Don’t have an account? <a href="{{ url_for('auth.signup') }}" class="signup-link">Sign up</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

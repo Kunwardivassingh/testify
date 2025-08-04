@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/dashboard_styles.css') }}">
+</head>
+<body>
+  <header class="dash-header">
+    <div class="dash-logo">Testify Dashboard</div>
+    <nav class="dash-nav">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#" class="nav-link">Reports</a>
+      <a href="#" class="nav-link">Alerts</a>
+      <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
+    </nav>
+  </header>
+  <main class="dash-main">
+    <section class="dash-filters">
+      <h2>Filters</h2>
+      <div class="filter-group">
+        <label for="date-range">Date Range:</label>
+        <input type="date" id="date-range-start" name="date-range-start">
+        <input type="date" id="date-range-end" name="date-range-end">
+      </div>
+      <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter">
+          <option value="">All</option>
+          <option value="Pass">Pass</option>
+          <option value="Fail">Fail</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+      <button class="filter-apply" onclick="applyFilters()">Apply Filters</button>
+    </section>
+    <section class="dash-content">
+      <h2>Test Data Overview</h2>
+      <div class="dash-table-container">
+        <table id="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Product Name</th>
+              <th>Test Type</th>
+              <th>Status</th>
+              <th>Execution Date</th>
+              <th>Tester</th>
+              <th>Test Duration</th>
+            </tr>
+          </thead>
+          <tbody id="data-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='assets/dashboard.js') }}"></script>
+</body>
+</html>

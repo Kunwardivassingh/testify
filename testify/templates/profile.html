@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/profile_styles.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+</head>
+<body>
+    <div class="profile-page-container">
+        <div class="profile-sidebar">
+            <h2 class="sidebar-title">TestFlow</h2>
+            <nav>
+                <a href="/dashboard/" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboards</a>
+                <a href="#" class="sidebar-link"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="#" class="sidebar-link"><i class="fas fa-bell"></i> Alerts</a>
+                <a href="/profile" class="sidebar-link active"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+        </div>
+
+        <div class="profile-main-content">
+            <h1 class="main-title">Settings</h1>
+            
+            <form method="post">
+                <div class="profile-section">
+                    <h2>User Profile</h2>
+                    <p>Manage your personal information and password.</p>
+                    <div class="profile-form-row">
+                        <div class="profile-form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" value="{{ current_user.name }}">
+                        </div>
+                        <div class="profile-form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" value="{{ current_user.email }}" readonly>
+                        </div>
+                    </div>
+                    <button type="button" class="change-password-btn">Change Password</button>
+                </div>
+
+                <div class="profile-section">
+                    <h2>Dashboard Settings</h2>
+                    <p>Customize your default dashboard view and notifications.</p>
+                    <div class="profile-form-row">
+                        <div class="profile-form-group">
+                            <label for="data-view">Default Data View</label>
+                            <select id="data-view" name="data_view">
+                                <option>Last 24 Hours</option>
+                                <option>Last 7 Days</option>
+                                <option>Last 30 Days</option>
+                            </select>
+                        </div>
+                        <div class="profile-form-group">
+                            <label for="notifications">Notification Preferences</label>
+                            <select id="notifications" name="notifications">
+                                <option>All</option>
+                                <option>Failures Only</option>
+                                <option>None</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h2>Help & Support</h2>
+                    <p>Find resources and get assistance.</p>
+                    <div class="support-links">
+                        <a href="#">Documentation <i class="fas fa-chevron-right"></i></a>
+                        <a href="#">Contact Support <i class="fas fa-chevron-right"></i></a>
+                        <a href="#">Community Forum <i class="fas fa-chevron-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="profile-actions">
+                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="submit" class="save-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

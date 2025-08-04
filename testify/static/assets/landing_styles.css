@@ -1,0 +1,254 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-dark: #12141D;
+    --bg-card: #1C1F2A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0A3B1;
+    --brand-blue: #0D6EFD;
+    --border-color: #2D313E;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* --- Header & Navigation --- */
+.main-header {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.logo .fas {
+    color: var(--brand-blue);
+    margin-right: 10px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--text-primary);
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--brand-blue);
+    color: var(--text-primary);
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+/* --- Hero Section --- */
+.hero-section {
+    padding: 100px 0;
+    background: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+}
+
+.hero-section h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.hero-section .subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    max-width: 650px;
+    margin: 0 auto 30px;
+}
+
+/* --- Features Section --- */
+.features-section {
+    padding: 80px 0;
+}
+
+.section-header h2 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: 18px;
+    margin-bottom: 50px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: var(--bg-card);
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.feature-card .fas {
+    font-size: 28px;
+    color: var(--brand-blue);
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+}
+
+/* --- Trusted Companies Section --- */
+.trusted-section {
+    padding: 60px 0;
+}
+
+.trusted-section h2 {
+    font-size: 24px;
+    color: var(--text-secondary);
+    margin-bottom: 40px;
+}
+
+.logos-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.logo-item {
+    background-color: var(--bg-card);
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    color: #6c757d;
+}
+
+/* --- CTA Section --- */
+.cta-section {
+    padding: 80px 0;
+}
+
+.cta-section h2 {
+    font-size: 36px;
+    margin-bottom: 15px;
+}
+
+.cta-section p {
+    color: var(--text-secondary);
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+/* --- Footer --- */
+.main-footer {
+    padding: 30px 0;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    margin-top: auto;
+}
+
+.footer-links {
+    margin-bottom: 15px;
+}
+
+.footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+.footer-links a:hover {
+    color: var(--text-primary);
+}
+
+.copyright {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    .logos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.header {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    background-color: #27293d;
+    border-bottom: 1px solid #444;
+}   

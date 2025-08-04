@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+      <link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}">
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <img src="{{ url_for('static', filename='testwise-logo.png') }}" alt="TestWise Logo" class="signup-logo">
+            <nav class="signup-nav">
+                <a href="#" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link">Reports</a>
+                <a href="#" class="nav-link">Analytics</a>
+                <a href="#" class="nav-link">Settings</a>
+            </nav>
+        </div>
+        <div class="signup-card">
+            <h2 class="signup-title">Create a new account</h2>
+            <p class="signup-subtitle">Get started with your real-time data analysis.</p>
+            <form method="POST" class="signup-form">
+                <div class="form-group">
+                    <label for="signup-fullname" class="form-label">Full Name</label>
+                    <input type="text" id="signup-fullname" name="name" class="form-input" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email" class="form-label">Email address</label>
+                    <input type="email" id="signup-email" name="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password" class="form-label">Password</label>
+                    <input type="password" id="signup-password" name="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" id="signup-confirm-password" name="confirm_password" class="form-input" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="signup-button">Create Account</button>
+                <p class="signup-footer">
+                    Already have an account? <a href="{{ url_for('auth.login') }}" class="login-link">Sign in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
