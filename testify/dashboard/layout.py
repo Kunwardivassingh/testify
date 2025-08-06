@@ -1,16 +1,22 @@
+
 from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 
 def get_layout():
     """
     Generates the final, professional layout for the dashboard.
-    - Wraps the DataTable in a specific div for controlled scrolling.
-    - Refines the grid layout for a professional appearance.
+    - Adds dcc.Location to read URL parameters.
+    - Adds dcc.Store for error messages.
+    - Adds a div to display error messages.
     """
     return html.Div(className='dashboard-container', children=[
+        dcc.Location(id='url', refresh=False),
         dcc.Store(id='filtered-data-store'),
+        dcc.Store(id='error-message-store'), # For error messages
         dcc.Download(id="download-dataframe-csv"),
-
+        # ADD THIS LINE for automatic refresh every 5 seconds
+        dcc.Interval(id='interval-component', interval=5*1000, n_intervals=0),
+        # --- HEADER SECTION ---
         html.Div(className='header', children=[
             html.H1("Testify "),
             html.Div(className='header-icons', children=[
@@ -53,22 +59,23 @@ def get_layout():
             ]),
 
             html.Div(className='dashboard-content', id='dashboard-content-area', children=[
+                html.Div(id='error-message-div'), # Div to display error messages
                 html.Div(className='title-bar', children=[
                     html.H2("Dashboard"),
                     html.P("Analyze data with comprehensive filters and export options.")
                 ]),
-                
+
                 dbc.Row([
                     dbc.Col(dbc.Card(id='kpi-total-tests', className='kpi-card')),
                     dbc.Col(dbc.Card(id='kpi-passed', className='kpi-card')),
                     dbc.Col(dbc.Card(id='kpi-failed', className='kpi-card')),
                     dbc.Col(dbc.Card(id='kpi-pending', className='kpi-card')),
                 ]),
-                
+
                 dbc.Row([
                     dbc.Col(dbc.Card(dcc.Graph(id='results-over-time-graph')), lg=12),
                 ]),
-                
+
                 dbc.Row([
                     dbc.Col(dbc.Card(dcc.Graph(id='stacked-bar-chart')), lg=7),
                     dbc.Col(dbc.Card(dcc.Graph(id='status-pie-chart')), lg=5),
@@ -78,7 +85,7 @@ def get_layout():
                     dbc.Col(dbc.Card(dcc.Graph(id='duration-box-plot')), lg=7),
                     dbc.Col(dbc.Card(dcc.Graph(id='duration-scatter-plot')), lg=5),
                 ]),
-                
+
                 dbc.Row([
                     dbc.Col(dbc.Card(dcc.Graph(id='tester-donut-chart')), lg=7),
                     dbc.Col(dbc.Card(dcc.Graph(id='coverage-area-chart')), lg=5),
@@ -101,7 +108,7 @@ def get_layout():
                         style_header={'backgroundColor': '#1a1c2c', 'fontWeight': 'bold'},
                     )
                 ]),
-                
+
                 html.Div(className='dashboard-footer', children=[
                     html.P("Data Source: Manual | Live", className='footer-text'),
                     html.Div(className='footer-buttons', children=[

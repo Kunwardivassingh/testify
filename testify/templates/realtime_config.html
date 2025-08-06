@@ -1,102 +1,78 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DataPulse</title>
+  <title>DataPulse - Real-Time Configuration</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='assets/datapulse_styles.css') }}">
 </head>
 <body>
   <header class="dp-header">
     <div class="dp-logo">DataPulse</div>
     <nav class="dp-nav">
-      <a href="#">Dashboards</a>
+      <a href="/dashboard/">Dashboards</a>
       <a href="#">Data Sources</a>
-      <a href="#">Alerts</a>
-      <a href="#">Reports</a>
     </nav>
     <div class="dp-user-icon"></div>
   </header>
   <main>
     <section class="dp-connect-section">
-      <h2>Connect to a Data Source</h2>
-      <p>Choose a data source to connect to your dashboard. You can also use mock data to test the connection.</p>
-      <div class="dp-data-source-toggle">
-        <button class="dp-toggle-button active" onclick="showLiveFields()">Live Data Source</button>
-        <button class="dp-toggle-button" onclick="showMockFields()">Mock Data</button>
+      <h2>Connect to a Live Data Source</h2>
+      <p>Publish a Google Sheet as a CSV and paste the public URL below to create a live dashboard.</p>
+
+      <div id="live-fields" class="dp-form-fields">
+        <div class="dp-form-group">
+          <label for="dp-api-endpoint">Live Data URL (e.g., Google Sheet CSV Link)</label>
+          <input type="text" id="dp-api-endpoint" placeholder="Paste your published Google Sheet URL here">
+        </div>
       </div>
-      <form id="dp-connect-form">
-        <!-- Live Data Fields -->
-        <div id="live-fields" class="dp-form-fields">
-          <div class="dp-form-group">
-            <label for="dp-data-source-type">Data Source Type</label>
-            <select id="dp-data-source-type">
-              <option value="">Select Data Source Type</option>
-              <option value="api">API</option>
-              <option value="database">Database</option>
-            </select>
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-api-endpoint">API Endpoint</label>
-            <input type="text" id="dp-api-endpoint" placeholder="Enter API Endpoint">
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-api-key">API Key</label>
-            <input type="text" id="dp-api-key" placeholder="Enter API Key">
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-data-format">Data Format</label>
-            <select id="dp-data-format">
-              <option value="">Select Data Format</option>
-              <option value="json">JSON</option>
-              <option value="xml">XML</option>
-            </select>
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-data-mapping">Data Mapping</label>
-            <input type="text" id="dp-data-mapping" placeholder='e.g. {"id": "userId"}'>
-          </div>
-        </div>
-        <!-- Mock Data Fields -->
-        <div id="mock-fields" class="dp-form-fields" style="display: none;">
-          <div class="dp-form-group">
-            <label for="dp-mock-file">Mock Data File</label>
-            <input type="file" id="dp-mock-file" accept=".json,.csv">
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-mock-delay">Delay (ms)</label>
-            <input type="number" id="dp-mock-delay" placeholder="Enter delay in milliseconds" min="0">
-          </div>
-          <div class="dp-form-group">
-            <label for="dp-mock-repeat">Repeat Count</label>
-            <input type="number" id="dp-mock-repeat" placeholder="Enter repeat count" min="1">
-          </div>
-        </div>
-        <div class="dp-button-group">
-          <button type="button" class="dp-test-button" onclick="testConnection()">Test Connection</button>
-          <button type="submit" class="dp-connect-button">Connect</button>
-        </div>
-      </form>
+
+      <div id="connection-status" style="margin-top: 15px; color: #ffc107;"></div>
+
+      <div class="dp-button-group">
+        <button type="button" class="dp-test-button" onclick="testAndConnect()">Connect to Live Dashboard</button>
+      </div>
     </section>
   </main>
+
   <script>
-    function showLiveFields() {
-      document.getElementById('live-fields').style.display = 'block';
-      document.getElementById('mock-fields').style.display = 'none';
-      document.querySelector('.dp-toggle-button.active').classList.remove('active');
-      event.target.classList.add('active');
-    }
+    async function testAndConnect() {
+      const apiUrl = document.getElementById('dp-api-endpoint').value;
+      const statusDiv = document.getElementById('connection-status');
 
-    function showMockFields() {
-      document.getElementById('live-fields').style.display = 'none';
-      document.getElementById('mock-fields').style.display = 'block';
-      document.querySelector('.dp-toggle-button.active').classList.remove('active');
-      event.target.classList.add('active');
-    }
+      if (!apiUrl) {
+        statusDiv.textContent = 'Please enter a URL.';
+        return;
+      }
 
-    function testConnection() {
-      alert('Testing connection...');
-      // Add your test logic here
+      statusDiv.textContent = 'Testing connection...';
+
+      try {
+        // 1. Call our secure backend to test the URL
+        const response = await fetch('/api/fetch_live_data', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: apiUrl }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to connect.');
+        }
+
+        // 2. If the connection is successful, redirect to the dashboard
+        statusDiv.textContent = 'Connection successful! Redirecting to dashboard...';
+
+        // Pass the live URL as a parameter to the dashboard
+        window.location.href = '/dashboard/?live_data_url=' + encodeURIComponent(apiUrl);
+
+      } catch (error) {
+        statusDiv.textContent = 'Error: ' + error.message;
+      }
     }
   </script>
 </body>

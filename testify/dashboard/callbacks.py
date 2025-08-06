@@ -1,39 +1,96 @@
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, no_update
 from extensions import db
 from models.test_data import TestData
-
+import requests # Make sure to import the requests library
+from urllib.parse import unquote
 def register_callbacks(dash_app):
 
-    # --- Main Data Filtering Callback (Corrected for Multi-Select) ---
+    # --- Main Data Filtering Callback (Now with Real-Time and Manual Modes) ---
     @dash_app.callback(
         Output('filtered-data-store', 'data'),
+        Output('error-message-store', 'data'), # New store for error messages
         Input('apply-filters-button', 'n_clicks'),
-        [State('product-dropdown', 'value'),
-         State('test-type-dropdown', 'value'),
-         State('status-dropdown', 'value'),
-         State('date-picker-range', 'start_date'),
-         State('date-picker-range', 'end_date')]
+        Input('interval-component', 'n_intervals'), # <--- ADD THIS INPUT
+        State('product-dropdown', 'value'),
+        State('test-type-dropdown', 'value'),
+        State('status-dropdown', 'value'),
+        State('date-picker-range', 'start_date'),
+        State('date-picker-range', 'end_date'),
+        State('url', 'search') # Read the URL query string
     )
-    def update_data_store(n_clicks, products, test_types, statuses, start_date, end_date):
-        query = TestData.query
-        if products:
-            query = query.filter(TestData.product_name.in_(products))
-        if test_types:
-            query = query.filter(TestData.test_type.in_(test_types))
-        if statuses:
-            query = query.filter(TestData.status.in_(statuses))
-        if start_date:
-            query = query.filter(TestData.execution_date >= start_date)
-        if end_date:
-            query = query.filter(TestData.execution_date <= end_date)
-        
-        df = pd.read_sql(query.statement, db.get_engine())
-        return df.to_json(date_format='iso', orient='split')
+    def update_data_store(n_clicks, n_intervals, products, test_types, statuses, start_date, end_date, search):
+        # Determine the mode (manual vs. real-time) from the URL
+        live_data_url = None
+        if search:
+            params = dict(x.split('=') for x in search.strip('?').split('&'))
+            encoded_url = params.get('live_data_url')
+            if encoded_url:
+                live_data_url = unquote(encoded_url) # <--- ADD THIS LINE TO DECODE THE URL
 
-    # --- Dropdown and KPI Callbacks ---
+        # --- Real-Time Mode ---
+        if live_data_url:
+            try:
+                # Use pandas to directly read the CSV data from the provided URL
+                df = pd.read_csv(live_data_url)
+                
+                 
+                # --- ADD THIS FILTERING LOGIC FOR THE DATAFRAME ---
+                # Convert execution_date to datetime for proper filtering
+                df['execution_date'] = pd.to_datetime(df['execution_date'])
+
+                if products:
+                    df = df[df['product_name'].isin(products)]
+                if test_types:
+                    df = df[df['test_type'].isin(test_types)]
+                if statuses:
+                    df = df[df['status'].isin(statuses)]
+                if start_date:
+                    df = df[df['execution_date'] >= pd.to_datetime(start_date)]
+                if end_date:
+                    df = df[df['execution_date'] <= pd.to_datetime(end_date)]
+                # --- END OF NEW FILTERING LOGIC ---
+
+
+                # Basic validation
+                expected_columns = ['product_name', 'test_id', 'status']
+                if not all(col in df.columns for col in expected_columns):
+                    return no_update, {'error': "Invalid data format in the provided URL."}
+
+                return df.to_json(date_format='iso', orient='split'), {'error': None}
+            except Exception as e:
+                return no_update, {'error': f"Failed to fetch or parse live data: {str(e)}"}
+
+        # --- Manual (Database) Mode ---
+        else:
+            query = TestData.query
+            if products:
+                query = query.filter(TestData.product_name.in_(products))
+            if test_types:
+                query = query.filter(TestData.test_type.in_(test_types))
+            if statuses:
+                query = query.filter(TestData.status.in_(statuses))
+            if start_date:
+                query = query.filter(TestData.execution_date >= start_date)
+            if end_date:
+                query = query.filter(TestData.execution_date <= end_date)
+
+            df = pd.read_sql(query.statement, db.get_engine())
+            return df.to_json(date_format='iso', orient='split'), {'error': None}
+
+    # --- Callback to Display Error Messages ---
+    @dash_app.callback(
+        Output('error-message-div', 'children'),
+        Input('error-message-store', 'data')
+    )
+    def display_error_message(error_data):
+        if error_data and error_data.get('error'):
+            return html.Div(error_data['error'], className='error-message')
+        return None
+
+    # --- Dropdown and KPI Callbacks (No changes needed here) ---
     @dash_app.callback(
         [Output('product-dropdown', 'options'), Output('test-type-dropdown', 'options')],
         Input('apply-filters-button', 'n_clicks') # Trigger on initial load
@@ -59,7 +116,7 @@ def register_callbacks(dash_app):
     create_kpi_callback('kpi-failed', lambda df: len(df[df['status'] == 'Fail']), "Failed")
     create_kpi_callback('kpi-pending', lambda df: len(df[df['status'] == 'Pending']), "Pending")
 
-    # --- Chart Callbacks ---
+    # --- Chart Callbacks (No changes needed here) ---
     chart_layout = {
         'paper_bgcolor': 'rgba(0,0,0,0)', 'plot_bgcolor': 'rgba(0,0,0,0)', 'font_color': '#e0e0e0',
         'xaxis': {'gridcolor': '#444'}, 'yaxis': {'gridcolor': '#444'},
@@ -67,7 +124,6 @@ def register_callbacks(dash_app):
         'margin': dict(l=40, r=30, t=80, b=40)
     }
 
-    # (All individual chart callbacks remain the same)
     @dash_app.callback(Output('results-over-time-graph', 'figure'), Input('filtered-data-store', 'data'))
     def update_line_chart(json_data):
         fig = go.Figure(layout=chart_layout)
@@ -149,7 +205,7 @@ def register_callbacks(dash_app):
         fig = px.imshow(heatmap_pivot, text_auto=True, aspect="auto", title="Test Execution Frequency")
         fig.update_layout(chart_layout)
         return fig
-        
+
     @dash_app.callback(Output('detailed-test-table', 'data'), Input('filtered-data-store', 'data'))
     def update_table(json_data):
         if not json_data: return []
@@ -158,7 +214,7 @@ def register_callbacks(dash_app):
         df['execution_date_str'] = pd.to_datetime(df['execution_date']).dt.strftime('%Y-%m-%d')
         return df.to_dict('records')
 
-    # --- Export and Profile Callbacks ---
+    # --- Export and Profile Callbacks (No changes needed) ---
     @dash_app.callback(
         Output("download-dataframe-csv", "data"),
         Input("export-csv-button", "n_clicks"),
@@ -169,7 +225,7 @@ def register_callbacks(dash_app):
         if not json_data: return None
         df = pd.read_json(json_data, orient='split')
         return dcc.send_data_frame(df.to_csv, "test_insights_export.csv", index=False)
-        
+
     dash_app.clientside_callback(
         """
         function(n_clicks) {
@@ -183,80 +239,77 @@ def register_callbacks(dash_app):
         Output('profile-icon', 'n_clicks_timestamp'),
         Input('profile-icon', 'n_clicks')
     )
-           # --- DEFINITIVE, PROFESSIONAL PDF Export Clientside Callback ---
-    # dash_app.clientside_callback(
-    #     """
-    #     function(n_clicks) {
-    #         if (n_clicks > 0) {
-    #             const { jsPDF } = window.jspdf;
-    #             const sourceElement = document.getElementById('dashboard-content-area');
 
-    #             // --- THE PROFESSIONAL FIX: CLONE THE ELEMENT ---
-    #             // 1. Create a clone of the element to be captured
-    #             const clone = sourceElement.cloneNode(true);
+    dash_app.clientside_callback(
+        """
+        function(n_clicks) {
+            if (n_clicks > 0) {
+                const { jsPDF } = window.jspdf;
+                const sourceElement = document.getElementById('dashboard-content-area');
 
-    #             // 2. Style the clone for printing: off-screen, full-width, auto-height
-    #             clone.style.position = 'absolute';
-    #             clone.style.top = '-9999px';
-    #             clone.style.left = '0px';
-    #             clone.style.width = sourceElement.offsetWidth + 'px'; // Use the same width as the original
-    #             clone.style.height = 'auto'; // Let it expand to its full content height
-    #             clone.style.overflow = 'visible'; // Ensure no internal scrolling clips the content
+                // --- THE PROFESSIONAL FIX: CLONE THE ELEMENT ---
+                // 1. Create a clone of the element to be captured
+                const clone = sourceElement.cloneNode(true);
 
-    #             // Append the clone to the body so it can be rendered off-screen
-    #             document.body.appendChild(clone);
+                // 2. Style the clone for printing: off-screen, full-width, auto-height
+                clone.style.position = 'absolute';
+                clone.style.top = '-9999px';
+                clone.style.left = '0px';
+                clone.style.width = sourceElement.offsetWidth + 'px'; // Use the same width as the original
+                clone.style.height = 'auto'; // Let it expand to its full content height
+                clone.style.overflow = 'visible'; // Ensure no internal scrolling clips the content
 
-    #             // Use a small timeout to allow the browser to render the full clone
-    #             setTimeout(() => {
-    #                 html2canvas(clone, {
-    #                     backgroundColor: '#1a1c2c',
-    #                     scale: 2,
-    #                     useCORS: true,
-    #                     // Tell html2canvas to use the clone's full scroll dimensions
-    #                     width: clone.scrollWidth,
-    #                     height: clone.scrollHeight
-    #                 }).then(canvas => {
-    #                     const imgData = canvas.toDataURL('image/png');
-    #                     const pdf = new jsPDF({
-    #                         orientation: 'landscape',
-    #                         unit: 'mm',
-    #                         format: 'a4'
-    #                     });
+                // Append the clone to the body so it can be rendered off-screen
+                document.body.appendChild(clone);
 
-    #                     const pdfWidth = pdf.internal.pageSize.getWidth();
-    #                     const pdfHeight = pdf.internal.pageSize.getHeight();
-    #                     const imgHeight = canvas.height * pdfWidth / canvas.width;
-    #                     let heightLeft = imgHeight;
-    #                     let position = 0;
+                // Use a small timeout to allow the browser to render the full clone
+                setTimeout(() => {
+                    html2canvas(clone, {
+                        backgroundColor: '#1a1c2c',
+                        scale: 2,
+                        useCORS: true,
+                        // Tell html2canvas to use the clone's full scroll dimensions
+                        width: clone.scrollWidth,
+                        height: clone.scrollHeight
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF({
+                            orientation: 'landscape',
+                            unit: 'mm',
+                            format: 'a4'
+                        });
 
-    #                     pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-    #                     heightLeft -= pdfHeight;
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = pdf.internal.pageSize.getHeight();
+                        const imgHeight = canvas.height * pdfWidth / canvas.width;
+                        let heightLeft = imgHeight;
+                        let position = 0;
 
-    #                     // Add new pages if the content is longer than one page
-    #                     while (heightLeft > 0) {
-    #                         position -= pdfHeight;
-    #                         pdf.addPage();
-    #                         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-    #                         heightLeft -= pdfHeight;
-    #                     }
+                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                        heightLeft -= pdfHeight;
 
-    #                     pdf.save('dashboard-export.pdf');
+                        // Add new pages if the content is longer than one page
+                        while (heightLeft > 0) {
+                            position -= pdfHeight;
+                            pdf.addPage();
+                            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                            heightLeft -= pdfHeight;
+                        }
 
-    #                 }).finally(() => {
-    #                     // 4. CRITICAL: Remove the clone from the DOM after capture
-    #                     document.body.removeChild(clone);
-    #                 });
-    #             }, 200); // 200ms delay for rendering
-    #         }
-    #         return '';
-    #     }
-    #     """,
-    #     Output('export-pdf-button', 'n_clicks_timestamp'),
-    #     Input('export-pdf-button', 'n_clicks')
-    # )
+                        pdf.save('dashboard-export.pdf');
 
-
-
+                    }).finally(() => {
+                        // 4. CRITICAL: Remove the clone from the DOM after capture
+                        document.body.removeChild(clone);
+                    });
+                }, 200); // 200ms delay for rendering
+            }
+            return '';
+        }
+        """,
+        Output('export-pdf-button', 'n_clicks_timestamp'),
+        Input('export-pdf-button', 'n_clicks')
+    )
     @dash_app.callback(
         Output('profile-icon', 'n_clicks'),
         Input('profile-icon', 'n_clicks')
@@ -265,77 +318,78 @@ def register_callbacks(dash_app):
         # This callback can be used to reset or handle profile icon clicks
         return n_clicks
     
-           # --- DEFINITIVE, FINAL, SINGLE-PAGE PDF Export Clientside Callback ---
-    dash_app.clientside_callback(
-        """
-        function(n_clicks) {
-            if (n_clicks > 0) {
-                const { jsPDF } = window.jspdf;
-                const elementToCapture = document.getElementById('dashboard-content-area');
-                const mainContent = document.querySelector('.main-content');
-                const body = document.body;
+    #            # --- DEFINITIVE, FINAL, SINGLE-PAGE PDF Export Clientside Callback ---
+#     dash_app.clientside_callback(
+#         """
+#         function(n_clicks) {
+#             if (n_clicks > 0) {
+#                 const { jsPDF } = window.jspdf;
+#                 const elementToCapture = document.getElementById('dashboard-content-area');
+#                 const mainContent = document.querySelector('.main-content');
+#                 const body = document.body;
 
-                // 1. Store all original styles that will be changed
-                const originalStyles = {
-                    body: { overflow: body.style.overflow, height: body.style.height },
-                    mainContent: { overflow: mainContent.style.overflow },
-                    element: { overflowY: elementToCapture.style.overflowY, height: elementToCapture.style.height }
-                };
+#                 // 1. Store all original styles that will be changed
+#                 const originalStyles = {
+#                     body: { overflow: body.style.overflow, height: body.style.height },
+#                     mainContent: { overflow: mainContent.style.overflow },
+#                     element: { overflowY: elementToCapture.style.overflowY, height: elementToCapture.style.height }
+#                 };
                 
-                // 2. Temporarily change styles on ALL parent containers to render the full content
-                body.style.overflow = 'visible';
-                body.style.height = 'auto';
-                mainContent.style.overflow = 'visible';
-                elementToCapture.style.overflowY = 'visible';
-                elementToCapture.style.height = 'auto';
+#                 // 2. Temporarily change styles on ALL parent containers to render the full content
+#                 body.style.overflow = 'visible';
+#                 body.style.height = 'auto';
+#                 mainContent.style.overflow = 'visible';
+#                 elementToCapture.style.overflowY = 'visible';
+#                 elementToCapture.style.height = 'auto';
 
-                // Use a timeout to ensure the browser has time to apply the new styles and re-render
-                setTimeout(() => {
-                    html2canvas(elementToCapture, {
-                        backgroundColor: '#1a1c2c',
-                        scale: 2, // For higher resolution
-                        logging: true,
-                        useCORS: true
-                    }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const canvasWidth = canvas.width;
-                        const canvasHeight = canvas.height;
+#                 // Use a timeout to ensure the browser has time to apply the new styles and re-render
+#                 setTimeout(() => {
+#                     html2canvas(elementToCapture, {
+#                         backgroundColor: '#1a1c2c',
+#                         scale: 2, // For higher resolution
+#                         logging: true,
+#                         useCORS: true
+#                     }).then(canvas => {
+#                         const imgData = canvas.toDataURL('image/png');
+#                         const canvasWidth = canvas.width;
+#                         const canvasHeight = canvas.height;
                         
-                        // --- THE SINGLE-PAGE FIX ---
-                        // Calculate the aspect ratio
-                        const ratio = canvasHeight / canvasWidth;
-                        // Define a fixed width for the PDF (e.g., A4 landscape width in mm)
-                        const pdfWidth = 297; 
-                        // Calculate the exact height the PDF needs to be to fit the entire image
-                        const pdfHeight = pdfWidth * ratio;
+#                         // --- THE SINGLE-PAGE FIX ---
+#                         // Calculate the aspect ratio
+#                         const ratio = canvasHeight / canvasWidth;
+#                         // Define a fixed width for the PDF (e.g., A4 landscape width in mm)
+#                         const pdfWidth = 297; 
+#                         // Calculate the exact height the PDF needs to be to fit the entire image
+#                         const pdfHeight = pdfWidth * ratio;
 
-                        // Create a new PDF with a CUSTOM format size, not a fixed one like 'a4'
-                        const pdf = new jsPDF({
-                            orientation: 'landscape',
-                            unit: 'mm',
-                            format: [pdfWidth, pdfHeight]
-                        });
+#                         // Create a new PDF with a CUSTOM format size, not a fixed one like 'a4'
+#                         const pdf = new jsPDF({
+#                             orientation: 'landscape',
+#                             unit: 'mm',
+#                             format: [pdfWidth, pdfHeight]
+#                         });
                         
-                        // Add the image to the single, perfectly-sized page
-                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+#                         // Add the image to the single, perfectly-sized page
+#                         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                         
-                        // The multi-page 'while' loop is completely removed.
+#                         // The multi-page 'while' loop is completely removed.
                         
-                        pdf.save('dashboard-export.pdf');
+#                         pdf.save('dashboard-export.pdf');
 
-                    }).finally(() => {
-                        // 3. CRITICAL: Restore all original styles to return the page to normal
-                        body.style.overflow = originalStyles.body.overflow;
-                        body.style.height = originalStyles.body.height;
-                        mainContent.style.overflow = originalStyles.mainContent.overflow;
-                        elementToCapture.style.overflowY = originalStyles.element.overflowY;
-                        elementToCapture.style.height = originalStyles.element.height;
-                    });
-                }, 200); // A small delay is crucial for rendering
-            }
-            return '';
-        }
-        """,
-        Output('export-pdf-button', 'n_clicks_timestamp'),
-        Input('export-pdf-button', 'n_clicks')
-    )
+#                     }).finally(() => {
+#                         // 3. CRITICAL: Restore all original styles to return the page to normal
+#                         body.style.overflow = originalStyles.body.overflow;
+#                         body.style.height = originalStyles.body.height;
+#                         mainContent.style.overflow = originalStyles.mainContent.overflow;
+#                         elementToCapture.style.overflowY = originalStyles.element.overflowY;
+#                         elementToCapture.style.height = originalStyles.element.height;
+#                     });
+#                 }, 200); // A small delay is crucial for rendering
+#             }
+#             return '';
+#         }
+#         """,
+#         Output('export-pdf-button', 'n_clicks_timestamp'),
+#         Input('export-pdf-button', 'n_clicks')
+#     )
+
