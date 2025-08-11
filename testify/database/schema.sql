@@ -6,7 +6,10 @@ CREATE TABLE user (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role ENUM('Admin', 'Analyst', 'Viewer') DEFAULT 'Viewer'
+    role ENUM('Admin', 'Analyst', 'Viewer') DEFAULT 'Viewer',
+    -- ADDED THE NEW COLUMNS FOR USER SETTINGS --
+    data_view VARCHAR(50) DEFAULT 'Last 7 Days',
+    notifications VARCHAR(50) DEFAULT 'All'
 );
 
 CREATE TABLE test_reports (
@@ -14,6 +17,10 @@ CREATE TABLE test_reports (
     user_id INT,
     source_type ENUM('upload', 'api') NOT NULL,
     upload_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    filename VARCHAR(255) NULL,
+    filesize VARCHAR(50) NULL,
+    status VARCHAR(50) DEFAULT 'Completed',
+
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 

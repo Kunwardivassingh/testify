@@ -9,12 +9,14 @@
 <body>
     <div class="profile-page-container">
         <div class="profile-sidebar">
-            <h2 class="sidebar-title">TestFlow</h2>
-            <nav>
+<div class="di-logo" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; padding: 16px 0;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height:36px; width:auto; vertical-align:middle;">
+            <span style="line-height: 1;">Testify</span>
+            </div>            <nav>
+                <a href="/mode_select" class="sidebar-link"><i class="fas fa-home"></i> Home</a>
                 <a href="/dashboard/" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboards</a>
-                <a href="#" class="sidebar-link"><i class="fas fa-file-alt"></i> Reports</a>
-                <a href="#" class="sidebar-link"><i class="fas fa-bell"></i> Alerts</a>
-                <a href="/profile" class="sidebar-link active"><i class="fas fa-cog"></i> Settings</a>
+                <a href="/reports" class="sidebar-link"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="{{ url_for('auth.profile') }}" class="sidebar-link active"><i class="fas fa-cog"></i> Settings</a>
             </nav>
         </div>
 
@@ -28,11 +30,11 @@
                     <div class="profile-form-row">
                         <div class="profile-form-group">
                             <label for="name">Name</label>
-                            <input type="text" id="name" name="name" value="{{ current_user.name }}">
+                            <input type="text" id="name" name="name" value="{{ user.name }}">
                         </div>
                         <div class="profile-form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" value="{{ current_user.email }}" readonly>
+                            <input type="email" id="email" name="email" value="{{ user.email }}" readonly>
                         </div>
                     </div>
                     <button type="button" class="change-password-btn">Change Password</button>
@@ -45,17 +47,17 @@
                         <div class="profile-form-group">
                             <label for="data-view">Default Data View</label>
                             <select id="data-view" name="data_view">
-                                <option>Last 24 Hours</option>
-                                <option>Last 7 Days</option>
-                                <option>Last 30 Days</option>
+                                <option {% if user.data_view == 'Last 24 Hours' %}selected{% endif %}>Last 24 Hours</option>
+                                <option {% if user.data_view == 'Last 7 Days' %}selected{% endif %}>Last 7 Days</option>
+                                <option {% if user.data_view == 'Last 30 Days' %}selected{% endif %}>Last 30 Days</option>
                             </select>
                         </div>
                         <div class="profile-form-group">
                             <label for="notifications">Notification Preferences</label>
                             <select id="notifications" name="notifications">
-                                <option>All</option>
-                                <option>Failures Only</option>
-                                <option>None</option>
+                                <option {% if user.notifications == 'All' %}selected{% endif %}>All</option>
+                                <option {% if user.notifications == 'Failures Only' %}selected{% endif %}>Failures Only</option>
+                                <option {% if user.notifications == 'None' %}selected{% endif %}>None</option>
                             </select>
                         </div>
                     </div>
@@ -72,7 +74,7 @@
                 </div>
                 
                 <div class="profile-actions">
-                    <button type="button" class="cancel-btn">Cancel</button>
+                    <button type="button" class="cancel-btn" onclick="window.location.href='/dashboard/'">Cancel</button>
                     <button type="submit" class="save-btn">Save Changes</button>
                 </div>
             </form>

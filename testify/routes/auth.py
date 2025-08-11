@@ -71,16 +71,22 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 @bp.route('/profile', methods=['GET', 'POST'])
-
+@login_required # It's good practice to ensure only logged-in users can access this
 def profile():
+    # Get the user from the current session
+    user = db.session.get(User, int(current_user.id))
+
     if request.method == 'POST':
-        user = current_user
+        # Update user fields from the submitted form
         user.name = request.form.get('name')
-        # Add password change logic here if needed
+        user.data_view = request.form.get('data_view')
+        user.notifications = request.form.get('notifications')
+        
         db.session.commit()
-        flash('Your profile has been updated.', 'success')
+        flash('Your profile has been updated successfully!', 'success')
         return redirect(url_for('auth.profile'))
-    return render_template('profile.html')
+        
+    return render_template('profile.html', user=user)
 
 
 @bp.route('/landing')

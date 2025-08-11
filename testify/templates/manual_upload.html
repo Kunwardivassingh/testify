@@ -3,19 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Insights</title>
+  <title>testify</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='assets/datainsights_styles.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
   <header class="di-header">
-    <div class="di-logo">Data Insights</div>
+    <div class="di-logo">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height:32px; vertical-align:middle; margin-right:8px;">
+      Testify
+    </div>
     <nav class="di-nav">
-      <a href="#">Overview</a>
+      <a href="/">Overview</a>
       <a href="/dashboard">Dashboards</a>
-      <a href="#">Reports</a>
-      <a href="#">Alerts</a>
+      <a href="/reports">Reports</a>
     </nav>
-    <div class="di-user-icon"></div>
+    <div class="profile-dropdown" style="position: relative;">
+      <i class="fas fa-user-circle" id="profile-icon" style="font-size: 28px; cursor: pointer;"></i>
+      <div class="dropdown-menu" id="dropdown-menu" style="display: none; position: absolute; right: 0; top: 36px; background: #fff; border: 1px solid #ced4da; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-width: 120px; z-index: 100;">
+        <a href="/profile" style="display: block; padding: 8px 16px; color: #222; text-decoration: none;">Profile</a>
+        <hr style="margin: 0;">
+        <a href="/logout" style="display: block; padding: 8px 16px; color: #222; text-decoration: none;">Logout</a>
+      </div>
+    </div>
   </header>
   <main>
     <section class="di-upload-section">
@@ -54,6 +64,7 @@
       <button class="di-upload-process-button" id="di-process-button" onclick="uploadAndRedirect()" style="display: none;">Upload and Process</button>
     </section>
   </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     const dropZone = document.getElementById('di-drop-zone');
     const fileInput = document.getElementById('di-file-input');
@@ -61,51 +72,55 @@
     const processButton = document.getElementById('di-process-button');
     const tableBody = document.getElementById('di-table-body');
 
-    // Handle file drop
-    dropZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '#1da1f2';
+    // Dropdown menu logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileIcon = document.getElementById('profile-icon');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        if (profileIcon) {
+            profileIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (profileIcon && !profileIcon.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        });
     });
 
-    dropZone.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      dropZone.style.borderColor = '#ced4da';
-    });
-
+    // File handling logic
+    dropZone.addEventListener('dragover', (e) => e.preventDefault());
+    dropZone.addEventListener('dragleave', (e) => e.preventDefault());
     dropZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      dropZone.style.borderColor = '#ced4da';
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleFile(files[0]);
-      }
+      if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
     });
-
-    // Handle file input change
     fileInput.addEventListener('change', (e) => {
-      if (fileInput.files.length > 0) {
-        handleFile(fileInput.files[0]);
-      }
+      if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
     });
 
     function excelDateToJSDate(serial) {
+      if (typeof serial !== 'number') return null;
       const excelEpoch = new Date(Date.UTC(1899, 11, 30));
       const delta = serial * 24 * 60 * 60 * 1000;
-      const jsDate = new Date(excelEpoch.getTime() + delta);
-      return jsDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      return new Date(excelEpoch.getTime() + delta).toISOString().split('T')[0];
     }
 
     function handleFile(file) {
+      const fileName = file.name;
+      const fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
       const reader = new FileReader();
+
       reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, {type: 'array'});
+        const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
-        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
-
+        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
         const rows = [];
+
         worksheet.forEach((row, index) => {
-          if (index === 0) return; // Skip header row
+          if (index === 0) return;
           rows.push({
             id: row[0] || null,
             report_id: row[1] || null,
@@ -113,7 +128,7 @@
             test_id: row[3] || '',
             test_type: row[4] || '',
             status: row[5] || 'Pending',
-            execution_date: excelDateToJSDate(row[6]) || null,
+            execution_date: excelDateToJSDate(row[6]),
             frequency: parseInt(row[7]) || 0,
             tester: row[8] || '',
             test_duration: parseInt(row[9]) || 0
@@ -133,33 +148,41 @@
 
         sampleDataDiv.style.display = 'block';
         processButton.style.display = 'block';
-        window.uploadedData = rows; // Store data globally for upload
+        window.uploadedData = { rows, fileName, fileSize };
       };
       reader.readAsArrayBuffer(file);
     }
 
     function uploadAndRedirect() {
       if (window.uploadedData) {
-      fetch('/api/upload', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-        rows: window.uploadedData,
-        user_id: 1, // Replace with dynamic user ID from session
-        source_type: 'upload'
+        fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            // THIS IS THE FIX: Send the data in the correct structure
+            rows: window.uploadedData.rows,
+            filename: window.uploadedData.fileName,
+            filesize: window.uploadedData.fileSize,
+            user_id: 1, // Replace with dynamic user ID from session
+            source_type: 'upload'
+          })
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Upload Success:', data);
-        window.location.href = '/dashboard'; // Redirect to dashboard route
-      })
-      .catch(error => console.error('Error:', error));
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+              console.error('Upload Error:', data.error);
+              alert('An error occurred during upload: ' + data.error);
+          } else {
+              console.log('Upload Success:', data);
+              window.location.href = '/reports'; // Redirect to reports page
+          }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            alert('A network error occurred. Please try again.');
+        });
       }
     }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>

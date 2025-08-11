@@ -8,6 +8,10 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(50), default='Viewer')
+    
+    # --- NEW FIELDS FOR USER PREFERENCES ---
+    data_view = db.Column(db.String(50), default='Last 7 Days')
+    notifications = db.Column(db.String(50), default='All')
 
     def set_password(self, passw):
         self.password = generate_password_hash(passw)
