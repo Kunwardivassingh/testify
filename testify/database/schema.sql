@@ -17,6 +17,10 @@ CREATE TABLE test_reports (
     user_id INT,
     source_type ENUM('upload', 'api') NOT NULL,
     upload_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    filename VARCHAR(255) NULL,
+    filesize VARCHAR(50) NULL,
+    status VARCHAR(50) DEFAULT 'Completed',
+
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 

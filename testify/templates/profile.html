@@ -9,12 +9,13 @@
 <body>
     <div class="profile-page-container">
         <div class="profile-sidebar">
-            <h2 class="sidebar-title">TestFlow</h2>
-            <nav>
-                <a href="/dashboard/" class="sidebar-link"><i class="fas fa-home"></i> Home</a>
+<div class="di-logo" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; padding: 16px 0;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height:36px; width:auto; vertical-align:middle;">
+            <span style="line-height: 1;">Testify</span>
+            </div>            <nav>
+                <a href="/mode_select" class="sidebar-link"><i class="fas fa-home"></i> Home</a>
                 <a href="/dashboard/" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboards</a>
-                <a href="#" class="sidebar-link"><i class="fas fa-file-alt"></i> Reports</a>
-                <a href="#" class="sidebar-link"><i class="fas fa-bell"></i> Alerts</a>
+                <a href="/reports" class="sidebar-link"><i class="fas fa-file-alt"></i> Reports</a>
                 <a href="{{ url_for('auth.profile') }}" class="sidebar-link active"><i class="fas fa-cog"></i> Settings</a>
             </nav>
         </div>

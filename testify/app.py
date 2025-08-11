@@ -96,11 +96,13 @@ def create_app():
         # db.create_all()
 
         # Register Blueprints
-        from routes import auth, upload, api_fetch, dashboard as dashboard_bp
+        from routes import auth, upload, api_fetch, dashboard as dashboard_bp, reports as reports_bp,legal as legal_bp
         app.register_blueprint(auth.bp)
         app.register_blueprint(upload.bp)
         app.register_blueprint(api_fetch.bp)
         app.register_blueprint(dashboard_bp.bp)
+        app.register_blueprint(reports_bp.bp) # Register the new reports blueprint
+        app.register_blueprint(legal_bp.bp) # Register the new legal blueprint
 
         # Setup Dash layout and callbacks
         from dashboard import layout, callbacks

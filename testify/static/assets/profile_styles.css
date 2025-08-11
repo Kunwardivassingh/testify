@@ -1,11 +1,11 @@
-/* General Body for Profile Page */
+/* General Body and Layout */
 body {
-    background-color: #f0f2f5; /* Light grey background */
+    background-color: #12141d; /* Dark background */
+    color: #e0e0e0; /* Light primary text */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     display: flex;
     height: 100vh;
-    color: #333;
 }
 
 .profile-page-container {
@@ -16,9 +16,9 @@ body {
 
 /* --- Sidebar Navigation --- */
 .profile-sidebar {
-    flex: 0 0 260px; /* Fixed width for the sidebar */
-    background-color: #ffffff;
-    border-right: 1px solid #e0e0e0;
+    flex: 0 0 260px;
+    background-color: #1c1f2a; /* Dark card/sidebar background */
+    border-right: 1px solid #2d313e; /* Dark border */
     padding: 25px;
     display: flex;
     flex-direction: column;
@@ -27,7 +27,7 @@ body {
 .profile-sidebar .sidebar-title {
     font-size: 24px;
     font-weight: 600;
-    color: #0d6efd; /* Blue color for 'TestFlow' */
+    color: #ffffff; /* White title */
     margin-bottom: 40px;
     padding-left: 10px;
 }
@@ -35,7 +35,7 @@ body {
 .profile-sidebar .sidebar-link {
     display: flex;
     align-items: center;
-    color: #555;
+    color: #a0a3b1; /* Light secondary text */
     text-decoration: none;
     padding: 12px 15px;
     border-radius: 6px;
@@ -46,18 +46,18 @@ body {
 
 .profile-sidebar .sidebar-link .fas {
     margin-right: 15px;
-    width: 20px; /* Align icons */
+    width: 20px;
     text-align: center;
 }
 
 .profile-sidebar .sidebar-link:hover {
-    background-color: #f0f2f5;
-    color: #000;
+    background-color: #2d313e;
+    color: #ffffff;
 }
 
 .profile-sidebar .sidebar-link.active {
-    background-color: #e9ecef; /* A light, distinct active state */
-    color: #0d6efd;
+    background-color: #2d313e;
+    color: #ffffff;
     font-weight: 500;
 }
 
@@ -65,33 +65,33 @@ body {
 .profile-main-content {
     flex-grow: 1;
     padding: 40px;
-    overflow-y: auto; /* Enable scrolling for content */
+    overflow-y: auto;
 }
 
 .profile-main-content .main-title {
     font-size: 32px;
     margin-top: 0;
     margin-bottom: 30px;
-    color: #111;
+    color: #ffffff;
 }
 
 .profile-section {
-    background-color: #ffffff;
+    background-color: #1c1f2a;
     padding: 30px;
     border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2d313e;
     margin-bottom: 30px;
 }
 
 .profile-section h2 {
     margin-top: 0;
     font-size: 20px;
-    color: #333;
+    color: #ffffff;
     font-weight: 600;
 }
 
 .profile-section p {
-    color: #666;
+    color: #a0a3b1;
     margin-bottom: 25px;
     font-size: 14px;
 }
@@ -102,15 +102,15 @@ body {
     margin-bottom: 20px;
 }
 
-.profile-form-group { 
-    flex: 1; 
+.profile-form-group {
+    flex: 1;
 }
 
 .profile-form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #444;
+    color: #a0a3b1;
     font-size: 14px;
 }
 
@@ -118,22 +118,23 @@ body {
     width: 100%;
     padding: 10px 12px;
     box-sizing: border-box;
-    background-color: #f8f9fa;
-    border: 1px solid #ced4da;
+    background-color: #2d313e;
+    border: 1px solid #444;
     border-radius: 4px;
-    color: #333;
+    color: #e0e0e0;
     font-size: 14px;
 }
 
 .profile-form-group input:read-only {
-    background-color: #e9ecef;
+    background-color: #2d313e;
     cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .change-password-btn {
     background: none;
-    border: 1px solid #6c757d;
-    color: #343a40;
+    border: 1px solid #a0a3b1;
+    color: #a0a3b1;
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
@@ -141,8 +142,8 @@ body {
     transition: background-color 0.2s, color 0.2s;
 }
 .change-password-btn:hover {
-    background-color: #6c757d;
-    color: #fff;
+    background-color: #2d313e;
+    color: #ffffff;
 }
 
 /* Help & Support Links */
@@ -151,16 +152,15 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2d313e;
     border-radius: 4px;
     margin-bottom: 10px;
     text-decoration: none;
-    color: #333;
-    transition: box-shadow 0.2s, border-color 0.2s;
+    color: #e0e0e0;
+    transition: border-color 0.2s;
 }
 .support-links a:hover {
     border-color: #0d6efd;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 /* Page Action Buttons */
@@ -172,7 +172,7 @@ body {
 }
 .profile-actions button {
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 500;
     font-size: 14px;
@@ -181,17 +181,17 @@ body {
 }
 
 .profile-actions .cancel-btn {
-    background-color: #fff;
-    border-color: #ced4da;
-    color: #333;
+    background-color: #2d313e;
+    border-color: #2d313e;
+    color: #e0e0e0;
 }
 .profile-actions .cancel-btn:hover {
-    background-color: #f8f9fa;
+    background-color: #444;
 }
 
 .profile-actions .save-btn {
     background-color: #0d6efd;
-    color: #fff;
+    color: #ffffff;
     border-color: #0d6efd;
 }
 .profile-actions .save-btn:hover {

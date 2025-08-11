@@ -6,7 +6,9 @@ from extensions import db
 from models.test_data import TestData
 import requests # Make sure to import the requests library
 from urllib.parse import unquote
+from flask_login import login_required  # <-- Add this import
 def register_callbacks(dash_app):
+    @login_required
 
     # --- Main Data Filtering Callback (Now with Real-Time and Manual Modes) ---
     @dash_app.callback(

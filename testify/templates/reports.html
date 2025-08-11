@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports - Data Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/reports_styles.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+</head>
+<body>
+    <div class="page-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="di-logo" style="display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; padding: 16px 0;">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height:36px; width:auto; vertical-align:middle;">
+            <span style="line-height: 1;">Testify</span>
+            </div>
+            <nav>
+                <a href="/dashboard/" class="sidebar-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="{{ url_for('reports.list_reports') }}" class="sidebar-link active"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="{{ url_for('auth.profile') }}" class="sidebar-link"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="content-header">
+                <h1>Reports</h1>
+                <a href="{{ url_for('upload.upload_file') }}" class="btn-upload">+ Upload Report</a>
+            </header>
+
+            <div class="reports-table-container">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>REPORT NAME</th>
+                            <th>UPLOAD TIME</th>
+                            <th>FILE SIZE</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports %}
+                        <tr>
+                            <td>{{ report.filename or 'N/A' }}</td>
+                            <td>{{ report.upload_time.strftime('%Y-%m-%d %I:%M %p') }}</td>
+                            <td>{{ report.filesize or 'N/A' }}</td>
+                            <td><span class="status-badge status-{{ report.status.lower() }}">{{ report.status }}</span></td>
+                            <!-- Inside your <tbody> loop, replace the Actions column <td> -->
+                            <td>
+                                <div class="action-menu-container">
+                                    <i class="fas fa-ellipsis-v action-icon"></i>
+                                    <div class="action-menu">
+                                        <form action="{{ url_for('reports.delete_report', report_id=report.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                            <button type="submit" class="delete-btn">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Place this script at the bottom of your file, before </body> -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle menu visibility
+    document.querySelectorAll('.action-icon').forEach(icon => {
+        icon.addEventListener('click', function(event) {
+            event.stopPropagation();
+            // Close all other menus first
+            document.querySelectorAll('.action-menu').forEach(m => {
+                if (m !== this.nextElementSibling) {
+                    m.style.display = 'none';
+                }
+            });
+            // Toggle the clicked menu
+            const menu = this.nextElementSibling;
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    // Hide menus if clicking elsewhere on the page
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.action-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    });
+});
+</script>
+</body>
+</html>

@@ -18,9 +18,10 @@ def get_layout():
         dcc.Interval(id='interval-component', interval=5*1000, n_intervals=0),
         # --- HEADER SECTION ---
         html.Div(className='header', children=[
+            # Use assets folder for Dash static files
+            html.Img(src='/assets/logo.png', alt="Logo", style={'height': '36px', 'width': 'auto', 'verticalAlign': 'middle'}),
             html.H1("Testify "),
-            html.Div(className='header-icons', children=[
-                html.I(className='fas fa-bell'),
+            html.Div(className='header-icons', children=[  # html.I(className='fas fa-bell'),
                 html.Div(className='profile-dropdown', children=[
                     html.I(className='fas fa-user-circle', id='profile-icon'),
                     html.Div(className='dropdown-menu', id='dropdown-menu', children=[

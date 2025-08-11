@@ -2,10 +2,12 @@ from flask import Blueprint, jsonify, request, redirect, url_for
 from extensions import db
 from models.test_data import TestData
 from sqlalchemy import func
+from flask_login import login_required
 
 bp = Blueprint('dashboard', __name__, url_prefix='/api/dashboard')
 
 @bp.route('/data')
+@login_required
 def get_dashboard_data():
     try:
         query = TestData.query
