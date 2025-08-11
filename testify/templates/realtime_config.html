@@ -10,13 +10,38 @@
 </head>
 <body>
   <header class="dp-header">
-    <div class="dp-logo">DataPulse</div>
-    <nav class="dp-nav">
-      <a href="/dashboard/">Dashboards</a>
-      <a href="#">Data Sources</a>
+<div class="di-logo">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="height:32px; vertical-align:middle; margin-right:8px;">
+      Testify
+    </div>
+    <nav class="dp-nav" style="display: inline-block; margin-left: 24px; vertical-align: middle;">
+      <a href="/">Overview</a>
     </nav>
-    <div class="dp-user-icon"></div>
-  </header>
+<div class="profile-dropdown" style="position: relative;">
+      <i class="fas fa-user-circle" id="profile-icon" style="font-size: 28px; cursor: pointer;"></i>
+      <div class="dropdown-menu" id="dropdown-menu" style="display: none; position: absolute; right: 0; top: 36px; background: #fff; border: 1px solid #ced4da; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-width: 120px; z-index: 100;">
+      <a href="/profile" style="display: block; padding: 8px 16px; color: #222; text-decoration: none;">Profile</a>
+      <hr style="margin: 0;">
+      <a href="/logout" style="display: block; padding: 8px 16px; color: #222; text-decoration: none;">Logout</a>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+      const profileIcon = document.getElementById('profile-icon');
+      const dropdownMenu = document.getElementById('dropdown-menu');
+      profileIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
+      });
+      document.addEventListener('click', function(e) {
+        if (!profileIcon.contains(e.target)) {
+        dropdownMenu.style.display = 'none';
+        }
+      });
+      });
+    </script>
+    <!-- Font Awesome for user icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">  </header>
   <main>
     <section class="dp-connect-section">
       <h2>Connect to a Live Data Source</h2>

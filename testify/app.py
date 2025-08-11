@@ -93,7 +93,7 @@ def create_app():
         from models.user import User
         from models.test_report import TestReport
         from models.test_data import TestData
-        db.create_all()
+        # db.create_all()
 
         # Register Blueprints
         from routes import auth, upload, api_fetch, dashboard as dashboard_bp

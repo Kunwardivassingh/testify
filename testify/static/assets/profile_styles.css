@@ -5,6 +5,7 @@ body {
     margin: 0;
     display: flex;
     height: 100vh;
+    color: #333;
 }
 
 .profile-page-container {
@@ -18,7 +19,7 @@ body {
     flex: 0 0 260px; /* Fixed width for the sidebar */
     background-color: #ffffff;
     border-right: 1px solid #e0e0e0;
-    padding: 20px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
 }
@@ -28,6 +29,7 @@ body {
     font-weight: 600;
     color: #0d6efd; /* Blue color for 'TestFlow' */
     margin-bottom: 40px;
+    padding-left: 10px;
 }
 
 .profile-sidebar .sidebar-link {
@@ -39,12 +41,13 @@ body {
     border-radius: 6px;
     margin-bottom: 10px;
     font-size: 16px;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 .profile-sidebar .sidebar-link .fas {
     margin-right: 15px;
     width: 20px; /* Align icons */
+    text-align: center;
 }
 
 .profile-sidebar .sidebar-link:hover {
@@ -67,13 +70,14 @@ body {
 
 .profile-main-content .main-title {
     font-size: 32px;
+    margin-top: 0;
     margin-bottom: 30px;
     color: #111;
 }
 
 .profile-section {
     background-color: #ffffff;
-    padding: 25px;
+    padding: 30px;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
     margin-bottom: 30px;
@@ -83,11 +87,13 @@ body {
     margin-top: 0;
     font-size: 20px;
     color: #333;
+    font-weight: 600;
 }
 
 .profile-section p {
     color: #666;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-size: 14px;
 }
 
 .profile-form-row {
@@ -96,23 +102,29 @@ body {
     margin-bottom: 20px;
 }
 
-.profile-form-group { flex: 1; }
+.profile-form-group { 
+    flex: 1; 
+}
+
 .profile-form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
     color: #444;
+    font-size: 14px;
 }
 
 .profile-form-group input, .profile-form-group select {
     width: 100%;
     padding: 10px 12px;
+    box-sizing: border-box;
     background-color: #f8f9fa;
     border: 1px solid #ced4da;
     border-radius: 4px;
     color: #333;
     font-size: 14px;
 }
+
 .profile-form-group input:read-only {
     background-color: #e9ecef;
     cursor: not-allowed;
@@ -120,19 +132,18 @@ body {
 
 .change-password-btn {
     background: none;
-    border: 1px solid #0d6efd;
-    color: #0d6efd;
+    border: 1px solid #6c757d;
+    color: #343a40;
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.2s, color 0.2s;
 }
 .change-password-btn:hover {
-    background-color: #0d6efd;
+    background-color: #6c757d;
     color: #fff;
 }
-
 
 /* Help & Support Links */
 .support-links a {
@@ -145,7 +156,7 @@ body {
     margin-bottom: 10px;
     text-decoration: none;
     color: #333;
-    transition: box-shadow 0.3s, border-color 0.3s;
+    transition: box-shadow 0.2s, border-color 0.2s;
 }
 .support-links a:hover {
     border-color: #0d6efd;
@@ -156,30 +167,32 @@ body {
 .profile-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 30px;
+    gap: 15px;
+    margin-top: 10px;
 }
 .profile-actions button {
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
+    font-size: 14px;
     border: 1px solid transparent;
-    transition: background-color 0.3s, border-color 0.3s;
+    transition: background-color 0.2s, border-color 0.2s;
 }
 
 .profile-actions .cancel-btn {
-    background-color: #e9ecef;
+    background-color: #fff;
     border-color: #ced4da;
     color: #333;
 }
 .profile-actions .cancel-btn:hover {
-    background-color: #d3d9df;
+    background-color: #f8f9fa;
 }
 
 .profile-actions .save-btn {
     background-color: #0d6efd;
     color: #fff;
+    border-color: #0d6efd;
 }
 .profile-actions .save-btn:hover {
     background-color: #0b5ed7;
