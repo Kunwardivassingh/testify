@@ -1,51 +1,3 @@
-# from flask import Flask
-# from flask_login import LoginManager
-# from dash import Dash, html
-# import dash_bootstrap_components as dbc
-# from config import Config
-# from extensions import db
-
-# login_manager = LoginManager()
-
-# def create_app():
-#     app = Flask(__name__, template_folder='templates', static_folder='static')
-#     app.config.from_object(Config)
-
-#     # Initialize extensions
-#     db.init_app(app)
-#     login_manager.init_app(app)
-#     login_manager.login_view = 'auth.login'
-
-#     # Initialize Dash app
-#     dash_app = Dash(__name__, server=app, url_base_pathname='/dashboard/', external_stylesheets=[dbc.themes.BOOTSTRAP])
-
-#     with app.app_context():
-#         # Register blueprints
-#         from routes import auth, upload, api_fetch
-#         app.register_blueprint(auth.bp)
-#         app.register_blueprint(upload.bp)
-#         app.register_blueprint(api_fetch.bp)
-
-#         # Import and set up Dash components
-#         from dashboard import layout, callbacks
-#         dash_app.layout = layout.get_layout()
-#         callbacks.register_callbacks(dash_app)
-
-#         # Create database tables
-#         db.create_all()
-
-#         # Define user_loader
-#         @login_manager.user_loader
-#         def load_user(user_id):
-#             from models.user import User
-#             return User.query.get(int(user_id))
-
-#     return app
-
-# if __name__ == '__main__':
-#     app = create_app()
-#     app.run(debug=True)
-
 
 
 from flask import Flask
@@ -87,7 +39,8 @@ def create_app():
         external_scripts=external_scripts, # Add scripts here
         suppress_callback_exceptions=True
     )
-    
+    server = app # <--- ADD THIS LINE
+
     with app.app_context():
         # Import models
         from models.user import User
@@ -123,6 +76,6 @@ def create_app():
 
     return app
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app = create_app()
+#     app.run()
