@@ -1,11 +1,22 @@
+# Flask Core & Web Server
 flask
+gunicorn
+
+# Database & ORM
 flask-sqlalchemy
+pymysql
+
+# User Authentication
 flask-login
+werkzeug
+
+# Dashboard & Data Visualization
 dash
 dash-bootstrap-components
 pandas
+plotly
+
+# File Handling & Utilities
 openpyxl
-weasyprint
 python-dotenv
-gunicorn
-psycopg2-binary
+requests
