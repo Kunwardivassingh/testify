@@ -106,11 +106,11 @@ venv\Scripts\activate
 # For macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
-4. Install Dependencies
+#  Install Dependencies
 Bash
 
 pip install -r requirements.txt
-5. Configure the Database
+#  Configure the Database
 Run the Schema: Use a MySQL client or the command line to execute the schema.sql file. This will create the database and all the necessary tables.
 
 Bash
@@ -120,7 +120,7 @@ Get-Content database\schema.sql | mysql -u root -p
 
 # For other terminals (Git Bash, macOS, Linux)
 mysql -u root -p < database/schema.sql
-6. Configure Environment Variables
+# Configure Environment Variables
 Create a .env file in the root directory of the project.
 
 Copy the contents of .env.example (if provided) or add the following:
@@ -129,13 +129,13 @@ SECRET_KEY=your_strong_random_secret_key
 DATABASE_URL=mysql+pymysql://root:your_mysql_password@localhost/test_report_db
 Replace your_mysql_password with your actual MySQL root password.
 
-7. Run the Application
+# Run the Application
 Bash
 
 python app.py
 The application will be available at http://127.0.0.1:5000.
 
-📖 Usage
+# 📖 Usage
 Navigate to http://127.0.0.1:5000.
 
 Sign up for a new account.
@@ -150,10 +150,10 @@ Choose Real-Time to connect to a live data URL.
 
 Explore the Dashboard, Reports, and Settings pages.
 
-🤝 Contributing
+# 🤝 Contributing
 Contributions are welcome! If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
 
-Fork the repository.
+# Fork the repository.
 
 Create your feature branch (git checkout -b feature/amazing-feature).
 
@@ -163,10 +163,11 @@ Push to the branch (git push origin feature/amazing-feature).
 
 Open a Pull Request.
 
-📜 License
+# 📜 License
 This project is licensed under the MIT License.
 
-📧 Contact
+# 📧 Contact
 Your Name – your.email@example.com
 
-Project Link: https://github.com/your-username/testify
+Project Link: https://github.com/kunwardivassingh/testify
+
