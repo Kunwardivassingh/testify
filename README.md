@@ -47,6 +47,7 @@
 
 The project follows a modular structure for better organization and scalability.
 
+```
 testify/
 ├── dashboard/         # Dash app layout and callbacks
 │   ├── callbacks.py
@@ -73,8 +74,7 @@ testify/
 ├── config.py          # Application configuration
 ├── extensions.py      # Flask extension initializations (e.g., db)
 └── requirements.txt   # Python dependencies
-
-
+```
 ---
 
 ## 🚀 Setup and Installation
@@ -170,6 +170,7 @@ This project is licensed under the MIT License.
 Your Name – kunwardivasingh@gmail.com
 
 Project Link: https://github.com/kunwardivassingh/testify
+
 
 
 
