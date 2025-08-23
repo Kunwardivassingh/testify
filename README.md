@@ -167,8 +167,9 @@ Open a Pull Request.
 This project is licensed under the MIT License.
 
 # 📧 Contact
-Your Name – your.email@example.com
+Your Name – kunwardivasingh@gmail.com
 
 Project Link: https://github.com/kunwardivassingh/testify
+
 
 
